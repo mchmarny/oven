@@ -20,6 +20,7 @@ var (
 	ErrDataNotFound = errors.New("data not found")
 )
 
+// New creates a new Service without creating the Firestore client
 func New(ctx context.Context, projectID string, opts ...option.ClientOption) *Service {
 	s := &Service{
 		projectID: projectID,
@@ -31,6 +32,12 @@ func New(ctx context.Context, projectID string, opts ...option.ClientOption) *Se
 	s.options = append(s.options, opts...)
 
 	return s
+}
+
+func NewWithClient(client *firestore.Client) *Service {
+	return &Service{
+		client: client,
+	}
 }
 
 // Service provides object representing the inbound HTTP request.
@@ -45,8 +52,17 @@ func isDataNotFoundError(err error) bool {
 	return err != nil && status.Code(err) == codes.NotFound
 }
 
-// GetClient creates
-func (s *Service) GetClient(ctx context.Context) error {
+// Close closes any resources held by the client.
+func (s *Service) Close() error {
+	if s.client != nil {
+		return s.client.Close()
+	}
+
+	return nil
+}
+
+// getClient creates the underlining Firestore client.
+func (s *Service) getClient(ctx context.Context) error {
 	if s.client == nil {
 		c, err := firestore.NewClient(ctx, s.projectID, s.options...)
 		if err != nil {
@@ -64,7 +80,7 @@ func (s *Service) GetCollection(ctx context.Context, name string) (col *firestor
 		return nil, errors.New("collection name required")
 	}
 
-	if err := s.GetClient(ctx); err != nil {
+	if err := s.getClient(ctx); err != nil {
 		return nil, errors.Wrapf(err, "error getting collection %s", name)
 	}
 

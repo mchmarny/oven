@@ -2,12 +2,11 @@ package oven
 
 import (
 	"context"
-	"reflect"
-
-	"github.com/pkg/errors"
-	"google.golang.org/api/iterator"
 
 	"cloud.google.com/go/firestore"
+	"github.com/mchmarny/oven/pkg/meta"
+	"github.com/pkg/errors"
+	"google.golang.org/api/iterator"
 )
 
 const (
@@ -56,11 +55,6 @@ func (s *Service) Query(ctx context.Context, q *Query, d interface{}) error {
 		return errors.Errorf("valid query required: %+v", q)
 	}
 
-	m, err := getDestinationMeta(d)
-	if err != nil {
-		return err
-	}
-
 	// collection
 	col, err := s.GetCollection(ctx, q.Collection)
 	if err != nil {
@@ -76,6 +70,11 @@ func (s *Service) Query(ctx context.Context, q *Query, d interface{}) error {
 		dir = firestore.Asc
 	}
 
+	m, err := meta.New(d)
+	if err != nil {
+		return err
+	}
+
 	// iterate
 	it := col.OrderBy(q.OrderBy, dir).Limit(q.Limit).Documents(ctx)
 	for {
@@ -87,73 +86,12 @@ func (s *Service) Query(ctx context.Context, q *Query, d interface{}) error {
 			return e
 		}
 
-		item := m.new()
+		item := m.Item()
 		if e := d.DataTo(&item); e != nil {
 			return errors.Errorf("error converting data to struct: %v", e)
 		}
-		m.append(item)
+		m.Append(item)
 	}
 
 	return nil
-}
-
-type destinationMeta struct {
-	list      reflect.Value
-	listByPtr bool
-	itemType  reflect.Type
-}
-
-func (d *destinationMeta) new() interface{} {
-	return reflect.New(d.itemType).Interface()
-}
-
-func (d *destinationMeta) append(item interface{}) {
-	var itemVal reflect.Value
-	if d.listByPtr {
-		itemVal = reflect.ValueOf(item)
-	} else {
-		itemVal = reflect.ValueOf(item).Elem()
-	}
-
-	listVal := reflect.Append(d.list, itemVal)
-
-	d.list.Set(listVal)
-}
-
-func getDestinationMeta(d interface{}) (*destinationMeta, error) {
-	if d == nil {
-		return nil, errors.New("destination type must be a non nil pointer")
-	}
-
-	list := reflect.ValueOf(d)
-	if !list.IsValid() || (list.Kind() == reflect.Ptr && list.IsNil()) {
-		return nil, errors.Errorf("destination must be a non nil pointer")
-	}
-	if list.Kind() != reflect.Ptr {
-		return nil, errors.Errorf("destination must be a pointer, got: %v", list.Type())
-	}
-
-	list = list.Elem()
-	listType := list.Type()
-
-	if list.Kind() != reflect.Slice {
-		return nil, errors.Errorf("destination must be a slice, got: %v", listType)
-	}
-
-	itemType := listType.Elem()
-	var itemIsPtr bool
-	// dereference to value if pointers to struct
-	if itemType.Kind() == reflect.Ptr {
-		itemType = itemType.Elem()
-		itemIsPtr = true
-	}
-
-	// make sure slice is empty
-	list.Set(list.Slice(0, 0))
-
-	return &destinationMeta{
-		list:      list,
-		listByPtr: itemIsPtr,
-		itemType:  itemType,
-	}, nil
 }

@@ -33,6 +33,8 @@ func main() {
 		HardCover: true,
 	}
 
+	fmt.Printf("unsaved book: %+v\n", book1)
+
 	// save book
 	if err := service.Save(ctx, book.CollectionName, book1.BookID, book1); err != nil {
 		log.Fatalf("failed to save: %v", err)
@@ -43,6 +45,7 @@ func main() {
 	if err := service.Get(ctx, book.CollectionName, book1.BookID, book2); err != nil {
 		log.Fatalf("failed to get: %v", err)
 	}
+	fmt.Printf("saved book: %+v\n", book2)
 
 	// check book's content
 	if fmt.Sprintf("%v", book1) != fmt.Sprintf("%v", book2) {
@@ -60,6 +63,7 @@ func main() {
 	if err := service.Get(ctx, book.CollectionName, book2.BookID, book3); err != nil {
 		log.Fatalf("failed to get: %v", err)
 	}
+	fmt.Printf("updated book: %+v\n", book3)
 
 	// check book's content
 	if book3.Pages != updatedPages {
@@ -78,4 +82,5 @@ func main() {
 			log.Fatalf("expected ErrDataNotFound error, got: %v", err)
 		}
 	}
+	fmt.Print("book deleted\n")
 }

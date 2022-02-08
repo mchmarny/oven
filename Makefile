@@ -32,10 +32,12 @@ integration: tidy ## Runs integration tests
 .PHONY: integration
 
 examples: tidy ## Runs all examples
-	# PROJECT_ID=$(EMULATOR_PROJECT) \
-	# FIRESTORE_EMULATOR_HOST="$(EMULATOR_HOST):$(EMULATOR_PORT)" \
-	# go run examples/crud/main.go
+	# crud
+	PROJECT_ID=$(EMULATOR_PROJECT) \
+	FIRESTORE_EMULATOR_HOST="$(EMULATOR_HOST):$(EMULATOR_PORT)" \
+	go run examples/crud/main.go
 
+	# query
 	PROJECT_ID=$(EMULATOR_PROJECT) \
 	FIRESTORE_EMULATOR_HOST="$(EMULATOR_HOST):$(EMULATOR_PORT)" \
 	go run examples/query/main.go
