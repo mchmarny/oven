@@ -1,0 +1,72 @@
+name: test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      datastore:
+        image: ghcr.io/mchmarny/firestore-emulator:v0.3.2
+        env:
+          PROJECT_ID: oven
+          PORT: 8888
+        ports:
+          - 8888:8888
+    steps:
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.17
+
+    - name: Cache Go Modules
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Checkout Code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+
+    - name: Tidy Modules
+      run: |
+        make tidy
+
+    - name: Config Lint
+      id: golangci_config
+      uses: andstor/file-existence-action@v1
+      with:
+        files: .golangci.yaml
+
+    - name: Lint Code
+      if: steps.golangci_config.outputs.files_exists == 'true'
+      uses: golangci/golangci-lint-action@v2
+      with:
+        version: latest
+        args: --timeout 3m
+
+    - name: Unit Test
+      run: |
+        make test
+      
+    - name: Integration Test
+      run: |
+        go test -count=1 -race -covermode=atomic -coverprofile=cover.out ./...
+      env:
+          FIRESTORE_EMULATOR_HOST: "localhost:8888"
+          PROJECT_ID: oven

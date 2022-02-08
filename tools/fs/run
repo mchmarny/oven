@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -xe
+
+# defaults
+IMAGE_DEFAULT="ghcr.io/mchmarny/firestore-emulator:v0.3.2"
+PROJECT_DEFAULT="oven"
+HOST_DEFAULT="localhost"
+PORT_DEFAULT="8888"
+
+# runtime args
+IMAGE="${1:-$IMAGE_DEFAULT}"
+PROJECT="${2:-$PROJECT_DEFAULT}"
+HOST="${3:-$HOST_DEFAULT}"
+PORT="${4:-$PORT_DEFAULT}"
+
+# stop if alerrady running
+docker rm -f firestore-emulator || true
+
+# start detached 
+docker run \
+  --name firestore-emulator \
+  --detach \
+  --env "PROJECT_ID=${PROJECT}" \
+  --env "PORT=${PORT}" \
+  --publish "${PORT}:${PORT}" \
+  "$IMAGE"
+
+# basic test 
+wget -qO- "http://${HOST}:${PORT}/v1/projects/${PROJECT}/databases/(default)/documents/test"

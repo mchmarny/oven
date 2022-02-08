@@ -1,0 +1,7 @@
+# This file is documented at https://git-scm.com/docs/gitattributes.
+
+# excludes path from being included in code coverage 
+**/zz_generated.*.go linguist-generated=true
+/pkg/**/*pb.go coverage-excluded=true
+/vendor/** coverage-excluded=true
+/tests/** coverage-excluded=true
