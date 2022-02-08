@@ -38,7 +38,8 @@ func TestOvenQuery(t *testing.T) {
 		assert.True(t, m.listByPtr)
 		assert.Equal(t, reflect.TypeOf(TestDoc{}), m.itemType)
 		assert.Equal(t, reflect.TypeOf([]*TestDoc{}), m.list.Type())
-		assert.Equal(t, reflect.TypeOf(TestDoc{}), reflect.TypeOf(m.new()))
+		// this will panic but it validates the full round reflection  trip
+		m.append(m.new())
 	})
 	t.Run("struct array", func(t *testing.T) {
 		var list []TestDoc
@@ -50,7 +51,7 @@ func TestOvenQuery(t *testing.T) {
 		assert.False(t, m.listByPtr)
 		assert.Equal(t, reflect.TypeOf(TestDoc{}), m.itemType)
 		assert.Equal(t, reflect.TypeOf([]TestDoc{}), m.list.Type())
-		assert.Equal(t, reflect.TypeOf(TestDoc{}), reflect.TypeOf(m.new()))
+		m.append(m.new())
 	})
 }
 
