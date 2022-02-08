@@ -25,6 +25,12 @@ test: tidy ## Runs unit tests
 	go test -short -count=1 -race -covermode=atomic -coverprofile=cover.out ./...
 .PHONY: test
 
+bench: tidy ## Runs benchmark tests
+	PROJECT_ID=$(EMULATOR_PROJECT) \
+	FIRESTORE_EMULATOR_HOST="$(EMULATOR_HOST):$(EMULATOR_PORT)" \
+	go test -bench=.
+.PHONY: bench
+
 integration: tidy ## Runs integration tests
 	PROJECT_ID=$(EMULATOR_PROJECT) \
 	FIRESTORE_EMULATOR_HOST="$(EMULATOR_HOST):$(EMULATOR_PORT)" \
