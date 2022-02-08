@@ -31,6 +31,12 @@ integration: tidy ## Runs integration tests
 	go test -count=1 -race -covermode=atomic -coverprofile=cover.out ./...
 .PHONY: integration
 
+examples: tidy ## Runs all examples
+	PROJECT_ID=$(EMULATOR_PROJECT) \
+	FIRESTORE_EMULATOR_HOST="$(EMULATOR_HOST):$(EMULATOR_PORT)" \
+	go run examples/crud/main.go
+.PHONY: examples
+
 cover: test ## Runs unit tests and putputs coverage
 	go tool cover -func=cover.out
 .PHONY: cover
