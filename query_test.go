@@ -53,6 +53,16 @@ func TestOvenQuery(t *testing.T) {
 		assert.Equal(t, reflect.TypeOf([]TestDoc{}), m.list.Type())
 		m.append(m.new())
 	})
+	t.Run("struct count", func(t *testing.T) {
+		var list []TestDoc
+		m, err := getDestinationMeta(&list)
+		assert.NoError(t, err)
+		assert.NotNil(t, m)
+		m.append(m.new())
+		m.append(m.new())
+		m.append(m.new())
+		assert.Equal(t, 3, m.list.Len())
+	})
 }
 
 func TestOvenQueryIntegration(t *testing.T) {
