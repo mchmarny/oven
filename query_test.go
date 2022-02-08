@@ -12,8 +12,6 @@ import (
 
 const (
 	numOfTestQueryDocs = 10
-	benchmarkSize      = 100
-	benchmarkAuthor    = "Douglas Adams"
 )
 
 func TestOvenQueryIntegration(t *testing.T) {
