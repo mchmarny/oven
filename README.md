@@ -27,10 +27,10 @@ go get github.com/mchmarny/oven
 
 The [examples](./examples) folder includes some of the most common use-cases
 
-* [Basic CRUD Operations](examples/crud) - Save, Get, Update, Delete methods. 
-* [Structured Query](examples/query) - Automatic mapping of multiple document results to a Go slice of structs (e.g. `[]Book{}` or `[]*Book{}`)
+* [Basic CRUD Operations](examples/crud/main.go) - Save, Get, Update, Delete methods. 
+* [Structured Query](examples/query/main.go) - Automatic mapping of multiple document results to a Go slice of structs (e.g. `[]Book{}` or `[]*Book{}`)
 
-Simple Example
+Simple example of structured query:
 
 ```go
 	var list []*book.Book
