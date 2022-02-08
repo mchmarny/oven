@@ -26,9 +26,7 @@ test: tidy ## Runs unit tests
 .PHONY: test
 
 bench: tidy ## Runs benchmark tests
-	PROJECT_ID=$(EMULATOR_PROJECT) \
-	FIRESTORE_EMULATOR_HOST="$(EMULATOR_HOST):$(EMULATOR_PORT)" \
-	go test -bench=.
+	go test -bench=. -count 5 -run=^# -benchtime=10s -benchmem ./...
 .PHONY: bench
 
 integration: tidy ## Runs integration tests

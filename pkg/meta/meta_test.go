@@ -64,3 +64,27 @@ func TestMeta(t *testing.T) {
 		assert.Equal(t, 3, m.list.Len())
 	})
 }
+
+func BenchmarkMeta10(b *testing.B)    { benchmarkMeta(b, 10) }
+func BenchmarkMeta100(b *testing.B)   { benchmarkMeta(b, 100) }
+func BenchmarkMeta1000(b *testing.B)  { benchmarkMeta(b, 1000) }
+func BenchmarkMeta10000(b *testing.B) { benchmarkMeta(b, 10000) }
+
+func benchmarkMeta(b *testing.B, limit int) {
+	if testing.Short() {
+		b.Skip()
+	}
+	var list []TestDoc
+	m, err := New(&list)
+	if err != nil {
+		b.Fatalf("failed to create meta: %v", err)
+	}
+
+	for i := 0; i < limit; i++ {
+		m.Append(m.Item())
+	}
+
+	if m.list.Len() != limit {
+		b.Fatalf("expected %d items, got %d", limit, m.list.Len())
+	}
+}
