@@ -32,9 +32,13 @@ integration: tidy ## Runs integration tests
 .PHONY: integration
 
 examples: tidy ## Runs all examples
+	# PROJECT_ID=$(EMULATOR_PROJECT) \
+	# FIRESTORE_EMULATOR_HOST="$(EMULATOR_HOST):$(EMULATOR_PORT)" \
+	# go run examples/crud/main.go
+
 	PROJECT_ID=$(EMULATOR_PROJECT) \
 	FIRESTORE_EMULATOR_HOST="$(EMULATOR_HOST):$(EMULATOR_PORT)" \
-	go run examples/crud/main.go
+	go run examples/query/main.go
 .PHONY: examples
 
 cover: test ## Runs unit tests and putputs coverage

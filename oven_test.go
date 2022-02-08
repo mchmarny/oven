@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStore(t *testing.T) {
+func TestOven(t *testing.T) {
 	t.Run("new with no args", func(t *testing.T) {
 		ctx := context.Background()
 		s := New(ctx, "test")
@@ -20,13 +20,14 @@ func TestStore(t *testing.T) {
 	})
 }
 
-type IntegrationDoc struct {
+type TestDoc struct {
+	DocID       string    `json:"id" firestore:"id"`
 	StringValue string    `json:"s1" firestore:"s1"`
 	TimeValue   time.Time `json:"t1" firestore:"t1"`
 	Int64Value  int64     `json:"i1" firestore:"i1"`
 }
 
-func TestStoreIntegration(t *testing.T) {
+func TestOvenIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip()
 	}
@@ -46,22 +47,22 @@ func TestStoreIntegration(t *testing.T) {
 		assert.NotNil(t, s)
 
 		col := fmt.Sprintf("testcol%d", time.Now().Nanosecond())
+		docID := id.NewID()
 
-		d := &IntegrationDoc{
+		d := &TestDoc{
+			DocID:       docID,
 			StringValue: fmt.Sprintf("test-%d", time.Now().Nanosecond()),
 			TimeValue:   time.Now().UTC(),
 			Int64Value:  time.Now().UTC().Unix(),
 		}
 
-		docID := id.NewID()
-
 		// save
-		err := s.Save(ctx, col, docID, d)
+		err := s.Save(ctx, col, d.DocID, d)
 		assert.NoError(t, err)
 
 		// get
-		d2 := &IntegrationDoc{}
-		err = s.GetByID(ctx, col, docID, d2)
+		d2 := &TestDoc{}
+		err = s.Get(ctx, col, docID, d2)
 		assert.NoError(t, err)
 		assert.Equal(t, d.StringValue, d2.StringValue)
 		assert.Equal(t, d.Int64Value, d2.Int64Value)
@@ -74,20 +75,20 @@ func TestStoreIntegration(t *testing.T) {
 		err = s.Update(ctx, col, docID, m1)
 		assert.NoError(t, err)
 
-		d3 := &IntegrationDoc{}
-		err = s.GetByID(ctx, col, docID, d3)
+		d3 := &TestDoc{}
+		err = s.Get(ctx, col, docID, d3)
 		assert.NoError(t, err)
 		assert.Equal(t, updatedValue, d3.StringValue)
 		assert.Equal(t, d2.TimeValue.Format(time.RFC3339), d3.TimeValue.Format(time.RFC3339))
 		assert.Equal(t, d2.Int64Value, d3.Int64Value)
 
 		// delete
-		err = s.DeleteByID(ctx, col, docID)
+		err = s.Delete(ctx, col, docID)
 		assert.NoError(t, err)
 
 		// no data found error after delete
-		d4 := &IntegrationDoc{}
-		err = s.GetByID(ctx, col, docID, d4)
+		d4 := &TestDoc{}
+		err = s.Get(ctx, col, docID, d4)
 		assert.Error(t, err)
 		assert.Equal(t, ErrDataNotFound, err)
 	})

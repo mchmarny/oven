@@ -71,8 +71,8 @@ func (s *Service) GetCollection(ctx context.Context, name string) (col *firestor
 	return s.client.Collection(name), nil
 }
 
-// DeleteByID deletes specific record by id.
-func (s *Service) DeleteByID(ctx context.Context, col, id string) error {
+// Delete deletes specific record by id.
+func (s *Service) Delete(ctx context.Context, col, id string) error {
 	if id == "" {
 		return errors.New("nil id")
 	}
@@ -95,8 +95,8 @@ func (s *Service) DeleteByID(ctx context.Context, col, id string) error {
 	return nil
 }
 
-// GetByID sets the in parameter to specific store record by id.
-func (s *Service) GetByID(ctx context.Context, col, id string, in interface{}) error {
+// Get sets the in parameter to specific store record by id.
+func (s *Service) Get(ctx context.Context, col, id string, in interface{}) error {
 	if id == "" {
 		return errors.New("id required")
 	}

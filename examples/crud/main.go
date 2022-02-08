@@ -8,20 +8,9 @@ import (
 	"time"
 
 	"github.com/mchmarny/oven"
+	"github.com/mchmarny/oven/examples/book"
 	"github.com/mchmarny/oven/pkg/id"
 )
-
-const (
-	collection = "books"
-)
-
-type Book struct {
-	BookID    string    `json:"book_id" firestore:"book_id"`
-	Name      string    `json:"name" firestore:"name"`
-	Published time.Time `json:"published" firestore:"published"`
-	Pages     int       `json:"pages" firestore:"pages"`
-	HardCover bool      `json:"hardcover" firestore:"hardcover"`
-}
 
 func main() {
 	projectID := os.Getenv("PROJECT_ID")
@@ -35,22 +24,23 @@ func main() {
 	service := oven.New(ctx, projectID)
 
 	// create a book
-	book1 := &Book{
+	book1 := &book.Book{
 		BookID:    id.NewID(),
 		Name:      "The Hitchhiker's Guide to the Galaxy",
+		Author:    "Douglas Adams",
 		Published: time.Now().AddDate(-1, -2, -3).UTC(),
 		Pages:     100,
 		HardCover: true,
 	}
 
 	// save book
-	if err := service.Save(ctx, collection, book1.BookID, book1); err != nil {
+	if err := service.Save(ctx, book.CollectionName, book1.BookID, book1); err != nil {
 		log.Fatalf("failed to save: %v", err)
 	}
 
 	// get the previously saved book
-	book2 := &Book{}
-	if err := service.GetByID(ctx, collection, book1.BookID, book2); err != nil {
+	book2 := &book.Book{}
+	if err := service.Get(ctx, book.CollectionName, book1.BookID, book2); err != nil {
 		log.Fatalf("failed to get: %v", err)
 	}
 
@@ -62,12 +52,12 @@ func main() {
 	// update
 	updatedPages := 200
 	updates := map[string]interface{}{"pages": updatedPages}
-	if err := service.Update(ctx, collection, book2.BookID, updates); err != nil {
+	if err := service.Update(ctx, book.CollectionName, book2.BookID, updates); err != nil {
 		log.Fatalf("failed to update: %v", err)
 	}
 
-	book3 := &Book{}
-	if err := service.GetByID(ctx, collection, book2.BookID, book3); err != nil {
+	book3 := &book.Book{}
+	if err := service.Get(ctx, book.CollectionName, book2.BookID, book3); err != nil {
 		log.Fatalf("failed to get: %v", err)
 	}
 
@@ -77,13 +67,13 @@ func main() {
 	}
 
 	// delete
-	if err := service.DeleteByID(ctx, collection, book3.BookID); err != nil {
+	if err := service.Delete(ctx, book.CollectionName, book3.BookID); err != nil {
 		log.Fatalf("failed to delete: %v", err)
 	}
 
 	// no data found error after delete
-	book4 := &Book{}
-	if err := service.GetByID(ctx, collection, book3.BookID, book4); err != nil {
+	book4 := &book.Book{}
+	if err := service.Get(ctx, book.CollectionName, book3.BookID, book4); err != nil {
 		if err != oven.ErrDataNotFound {
 			log.Fatalf("expected ErrDataNotFound error, got: %v", err)
 		}
