@@ -16,5 +16,7 @@ ignore:
   - "**/*.pb.go" # Ignore proto-generated files.
   - "hack"
   - "test"
+  - "tools"
   - "third_party"
+  - "examples"
   - "vendor"
