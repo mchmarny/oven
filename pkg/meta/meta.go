@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// MetaList represents a meta information derived from an interface representing slice of structs.
 type MetaList struct {
 	list      reflect.Value
 	listByPtr bool

@@ -27,6 +27,7 @@ var (
 	ErrInvalidDestinationType = errors.New("destination type must be a non nil pointer")
 )
 
+// Query represents a query to be executed against the Firestore.
 type Query struct {
 	Collection string
 	Criteria   *Criterion
@@ -35,12 +36,14 @@ type Query struct {
 	Limit      int
 }
 
+// Criterion represents a single criteria for a query.
 type Criterion struct {
 	Path      string
 	Operation OperationType
 	Value     interface{}
 }
 
+// OperationType represents the type of operation to be performed.
 type OperationType string
 
 func appendWhere(col *firestore.CollectionRef, criteria ...*Criterion) {
@@ -49,7 +52,7 @@ func appendWhere(col *firestore.CollectionRef, criteria ...*Criterion) {
 	}
 }
 
-// GetByQuery retreaves access info for all users since last update.
+// Query retreaves access info for all users since last update.
 func (s *Service) Query(ctx context.Context, q *Query, d interface{}) error {
 	if q == nil || q.Collection == "" {
 		return errors.Errorf("valid query required: %+v", q)

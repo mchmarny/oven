@@ -34,6 +34,7 @@ func New(ctx context.Context, projectID string, opts ...option.ClientOption) *Se
 	return s
 }
 
+// NewWithClient creates a new Service with a pre-existing Firestore client.
 func NewWithClient(client *firestore.Client) *Service {
 	return &Service{
 		client: client,
