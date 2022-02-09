@@ -16,11 +16,11 @@ const (
 )
 
 var (
-	// ErrDataNotFound is thrown when query does not find the requested data
+	// ErrDataNotFound is thrown when query does not find the requested data.
 	ErrDataNotFound = errors.New("data not found")
 )
 
-// New creates a new Service without creating the Firestore client
+// New creates a new Service without creating the Firestore client.
 func New(ctx context.Context, projectID string, opts ...option.ClientOption) *Service {
 	s := &Service{
 		projectID: projectID,
@@ -160,6 +160,7 @@ func (s *Service) Save(ctx context.Context, col, id string, in interface{}) erro
 	return nil
 }
 
+// Update updates the data in the store.
 func (s *Service) Update(ctx context.Context, col, id string, args map[string]interface{}) error {
 	if col == "" || id == "" {
 		return errors.New("nil collection or id  in update")

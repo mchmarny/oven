@@ -26,8 +26,6 @@ linters-settings:
     min-complexity: 25
   goimports:
     local-prefixes: github.com/golangci/golangci-lint
-  golint:
-    min-confidence: 0
   govet:
     check-shadowing: true
   lll:
@@ -47,18 +45,21 @@ linters:
   enable:
     - bodyclose
     - deadcode
-    - depguard
     - dogsled
     - dupl
     - errcheck
+    - exhaustive
+    - exportloopref
     - funlen
+    - gofmt
     - gochecknoinits
     - goconst
     - gocritic
     - gocyclo
+    - godot
     - gofmt
     - goimports
-    - gomnd
+    - revive
     - goprintffuncname
     - gosec
     - gosimple
@@ -67,17 +68,33 @@ linters:
     - lll
     - misspell
     - nakedret
+    - noctx
     - nolintlint
     - rowserrcheck
-    - exportloopref
+    - sqlclosecheck
     - staticcheck
     - structcheck
     - stylecheck
-    - typecheck
     - unconvert
     - unparam
     - unused
     - varcheck
+    - whitespace
+    - asciicheck
+    - depguard
+    - exportloopref
+    - funlen
+    - gochecknoglobals
+    - gocognit
+    - godox
+    - goheader
+    - gomodguard
+    - goprintffuncname
+    - nestif
+    - prealloc
+    - rowserrcheck
+    - stylecheck
+    - typecheck
     - whitespace
 
 issues:

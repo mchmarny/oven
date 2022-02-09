@@ -1,6 +1,6 @@
 package array
 
-// Contains checks for val in list
+// Contains checks for val in list.
 func Contains(list []int64, val int64) bool {
 	if list == nil {
 		return false

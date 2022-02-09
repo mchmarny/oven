@@ -23,7 +23,7 @@ const (
 )
 
 var (
-	// ErrInvalidDestinationType is thrown when the item type is not a pointer to a struct
+	// ErrInvalidDestinationType is thrown when the item type is not a pointer to a struct.
 	ErrInvalidDestinationType = errors.New("destination type must be a non nil pointer")
 )
 

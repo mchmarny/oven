@@ -6,15 +6,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-// MetaList represents a meta information derived from an interface representing slice of structs.
-type MetaList struct {
+// Destination represents a meta information derived from an interface representing slice of structs.
+type Destination struct {
 	list      reflect.Value
 	listByPtr bool
 	itemType  reflect.Type
 }
 
-// New creates a new MetaList from a given list (pointer to []something or []*something )
-func New(d interface{}) (*MetaList, error) {
+// New creates a new MetaList from a given list (pointer to []something or []*something).
+func New(d interface{}) (*Destination, error) {
 	if d == nil {
 		return nil, errors.New("destination type must be a non nil pointer")
 	}
@@ -45,7 +45,7 @@ func New(d interface{}) (*MetaList, error) {
 	// make sure slice is empty
 	list.Set(list.Slice(0, 0))
 
-	return &MetaList{
+	return &Destination{
 		list:      list,
 		listByPtr: itemIsPtr,
 		itemType:  itemType,
@@ -53,12 +53,12 @@ func New(d interface{}) (*MetaList, error) {
 }
 
 // Item returns the item.
-func (d *MetaList) Item() interface{} {
+func (d *Destination) Item() interface{} {
 	return reflect.New(d.itemType).Interface()
 }
 
 // Append appends a new item to the list.
-func (d *MetaList) Append(item interface{}) {
+func (d *Destination) Append(item interface{}) {
 	var itemVal reflect.Value
 	if d.listByPtr {
 		itemVal = reflect.ValueOf(item)
