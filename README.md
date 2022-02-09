@@ -2,7 +2,11 @@
 
 [Cloud Firestore](https://firebase.google.com/docs/firestore) wrapper client library
 
-[![test](https://github.com/mchmarny/oven/actions/workflows/test-on-push.yaml/badge.svg?branch=main)](https://github.com/mchmarny/oven/actions/workflows/test-on-push.yaml) [![Go Report Card](https://goreportcard.com/badge/github.com/mchmarny/oven)](https://goreportcard.com/report/github.com/mchmarny/oven) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/mchmarny/oven) [![codecov](https://codecov.io/gh/mchmarny/oven/branch/main/graph/badge.svg?token=00H8S7GMPP)](https://codecov.io/gh/mchmarny/oven)
+[![test](https://github.com/mchmarny/oven/actions/workflows/test-on-push.yaml/badge.svg?branch=main)](https://github.com/mchmarny/oven/actions/workflows/test-on-push.yaml) 
+[![Go Report Card](https://goreportcard.com/badge/github.com/mchmarny/oven)](https://goreportcard.com/report/github.com/mchmarny/oven) 
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/mchmarny/oven) 
+[![codecov](https://codecov.io/gh/mchmarny/oven/branch/main/graph/badge.svg?token=00H8S7GMPP)](https://codecov.io/gh/mchmarny/oven) 
+[![GoDoc](https://godoc.org/github.com/mchmarny/oven?status.svg)](https://godoc.org/github.com/mchmarny/oven)
 
 
 # Overview 
