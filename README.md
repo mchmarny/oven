@@ -7,15 +7,15 @@
 
 # Overview 
 
-Cloud Firestore is a Serverless document database. It comes with with multi-regional replication, powerful query engine, and seamless integration into the broader Google Cloud. I found myself use it frequently over last few years. While Firestore exposes both HTTP and RPC APIs to which you can make direct calls, most people rely on one of the [client libraries](https://cloud.google.com/firestore/docs/reference/libraries). The [Go client library](https://pkg.go.dev/cloud.google.com/go/firestore) for Firestore is [well documented](https://firebase.google.com/docs/firestore/quickstart) and has a rich set of features. 
+Cloud Firestore is a Serverless document database. It comes with with multi-regional replication, powerful query engine, and seamless integration into the broader Google Cloud. I found myself use it frequently over last few years. While Firestore exposes both HTTP and RPC APIs to which you can make direct calls, most people rely on one of the [client libraries](https://cloud.google.com/firestore/docs/reference/libraries), and the [Go library](https://pkg.go.dev/cloud.google.com/go/firestore) for Firestore is certainly [well documented](https://firebase.google.com/docs/firestore/quickstart). 
 
-Having used Firestore on a few projects I did find it wee bit verbose and repetitive in some places. It's mostly due to the fact that it's auto-generated. Oven is a standalone library, wrapping the Firestore client, that hides some of the complexity and shortens some of the more verbose use-cases. 
+Having used Firestore on a few projects though, I did find it wee bit verbose and repetitive in some places. Oven is a wrapper the the standard Firestore client library. It hides some of the complexity (e.g. iterator over resulting documents), and shortens a few of the more verbose, but common, use-cases. 
 
 # Features
 
 * Easy Save, Update, Get, Delete
-* Query support using structured criteria 
-* Exposes native Firestore client for when you need to extend it
+* Structured criteria Query
+* Easy to extend via Firestore client and collection accessors
 
 # Install
 
