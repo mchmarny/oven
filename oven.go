@@ -38,6 +38,9 @@ func New(ctx context.Context, projectID string, opts ...option.ClientOption) *Se
 func NewWithClient(client *firestore.Client) *Service {
 	return &Service{
 		client: client,
+		options: []option.ClientOption{
+			option.WithUserAgent(userAgentDefault),
+		},
 	}
 }
 

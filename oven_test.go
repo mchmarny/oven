@@ -2,12 +2,14 @@ package oven
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 	"testing"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	"github.com/mchmarny/oven/pkg/id"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,6 +19,25 @@ func TestOven(t *testing.T) {
 		ctx := context.Background()
 		s := New(ctx, "test")
 		assert.NotNil(t, s)
+		assert.NoError(t, s.Close())
+		_, err := s.GetCollection(ctx, "")
+		assert.Error(t, err)
+		err = s.Save(ctx, "", "", nil)
+		assert.Error(t, err)
+		err = s.Update(ctx, "", "", nil)
+		assert.Error(t, err)
+		err = s.Get(ctx, "", "", nil)
+		assert.Error(t, err)
+		err = s.Delete(ctx, "", "")
+		assert.Error(t, err)
+	})
+	t.Run("new with firestore client", func(t *testing.T) {
+		c := &firestore.Client{}
+		s := NewWithClient(c)
+		assert.NotNil(t, s)
+	})
+	t.Run("data not found error", func(t *testing.T) {
+		assert.False(t, isDataNotFoundError(errors.New("data not found")))
 	})
 }
 

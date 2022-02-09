@@ -57,6 +57,10 @@ type Criterion struct {
 type OperationType string
 
 func appendWhere(col *firestore.CollectionRef, criteria ...*Criterion) {
+	if col == nil || len(criteria) == 0 {
+		return
+	}
+
 	for _, c := range criteria {
 		col.Where(c.Path, string(c.Operation), c.Value)
 	}
