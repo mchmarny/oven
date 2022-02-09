@@ -10,16 +10,26 @@ import (
 )
 
 const (
-	OperationTypeEqual              OperationType = "=="
-	OperationTypeNotEqual           OperationType = "!="
-	OperationTypeLessThan           OperationType = "<"
-	OperationTypeLessThanOrEqual    OperationType = "<="
-	OperationTypeGreaterThan        OperationType = ">"
+	// OperationTypeEqual is equal to.
+	OperationTypeEqual OperationType = "=="
+	// OperationTypeNotEqual is not equal to.
+	OperationTypeNotEqual OperationType = "!="
+	// OperationTypeLessThan is less than.
+	OperationTypeLessThan OperationType = "<"
+	// OperationTypeLessThanOrEqual is less than or equal to.
+	OperationTypeLessThanOrEqual OperationType = "<="
+	// OperationTypeGreaterThan is greater than.
+	OperationTypeGreaterThan OperationType = ">"
+	// OperationTypeGreaterThanOrEqual is greater than or equal to.
 	OperationTypeGreaterThanOrEqual OperationType = ">="
-	OperationTypeArrayContains      OperationType = "array-contains"
-	OperationTypeArrayContainsAny   OperationType = "array-contains-any"
-	OperationTypeIn                 OperationType = "in"
-	OperationTypeNotIn              OperationType = "not-in"
+	// OperationTypeArrayContains is array contains.
+	OperationTypeArrayContains OperationType = "array-contains"
+	// OperationTypeArrayContainsAny is array contains any.
+	OperationTypeArrayContainsAny OperationType = "array-contains-any"
+	// OperationTypeIn is in.
+	OperationTypeIn OperationType = "in"
+	// OperationTypeNotIn is not in.
+	OperationTypeNotIn OperationType = "not-in"
 )
 
 var (
