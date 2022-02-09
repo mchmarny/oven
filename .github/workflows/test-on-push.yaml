@@ -45,7 +45,8 @@ jobs:
 
     - name: Tidy Modules
       run: |
-        make tidy
+        go mod tidy
+        go mod vendor
 
     - name: Config Lint
       id: golangci_config
@@ -60,9 +61,10 @@ jobs:
         version: latest
         args: --timeout 3m
 
+    # fast, so run this first
     - name: Unit Test
       run: |
-        make test
+        go test -short -count=1 -race -covermode=atomic
       
     - name: Integration Test
       run: |
@@ -70,3 +72,9 @@ jobs:
       env:
           FIRESTORE_EMULATOR_HOST: "localhost:8888"
           PROJECT_ID: oven
+
+    - name: Test Coverage
+      uses: codecov/codecov-action@v2
+      with:
+        files: ./cover.out
+        fail_ci_if_error: true

@@ -25,34 +25,99 @@ go get github.com/mchmarny/oven
 
 # Usage
 
-The [examples](./examples) folder includes some of the most common use-cases
+The [examples](./examples) folder includes some of the most common use-cases with two fully functional code:
 
-* [Basic CRUD Operations](examples/crud/main.go) - Save, Get, Update, Delete methods. 
-* [Structured Query](examples/query/main.go) - Automatic mapping of multiple document results to a Go slice of structs (e.g. `[]Book{}` or `[]*Book{}`)
+* [Basic CRUD](examples/crud/main.go) - Save, Get, Update, Delete operations 
+* [Structured Query](examples/query/main.go) - With automatic result mapping to a slice
 
-Simple example of structured query:
+## Service 
 
 ```go
-	var list []*book.Book
-	q := &oven.Query{
-		Collection: "books",
-		Criteria: &oven.Criterion{
-			Path:      "author", // `firestore:"author"`
-			Operation: oven.OperationTypeEqual,
-			Value:     "Douglas Adams",
-		},
-		OrderBy: "published", // `firestore:"published"`
-		Desc:    true,
-		Limit:   10,
-	}
+package main
 
-	if err := service.Query(ctx, q, &list); err != nil {
-		panic(err)
-	}
+import (
+	"context"
 
-	for i, b := range list {
-		fmt.Printf("book[%d]: %+v\n", i, b)
-	}
+	"github.com/mchmarny/oven"
+)
+
+func main() {
+	ctx := context.Background()
+	s := oven.New(ctx, "my-project-id")
+}
+```
+
+You can also use an existing Firestore client: 
+
+```go
+// c is an existing *firestore.Client
+s := oven.NewWithClient(c) 
+```
+
+## Save
+
+```go
+b := Book{
+	ID:     "id-123",
+	Title:  "The Hitchhiker's Guide to the Galaxy",
+	Author: "Douglas Adams",
+}
+
+if err := s.Save(ctx, "books", b.ID, &b); err != nil {
+	handleErr(err)
+}
+```
+
+## Get
+
+```go
+b := &Book{}
+if err := s.Get(ctx, "books", "id-123", b); err != nil {
+	handleErr(err)
+}
+```
+
+## Update
+
+> Using `Title` field with `firestore:"title"` tag
+
+```go
+m := map[string]interface{}{
+	"title": "Some new title",
+}
+
+if err := s.Update(ctx, "books", "id-123", m); err != nil {
+	handleErr(err)
+}
+```
+
+## Delete
+
+```go
+if err := s.Delete(ctx, "books", "id-123"); err != nil {
+	handleErr(err)
+}
+```
+
+## Query
+
+```go
+q := &oven.Query{
+	Collection: "books",
+	Criteria: &oven.Criterion{
+		Path:      "author", // `firestore:"author"`
+		Operation: oven.OperationTypeEqual,
+		Value:     "Douglas Adams",
+	},
+	OrderBy: "published", // `firestore:"published"`
+	Desc:    true,
+	Limit:   10,
+}
+
+var list []*Book
+if err := s.Query(ctx, q, &list); err != nil {
+	handleErr(err)
+}
 ```
 
 # License
