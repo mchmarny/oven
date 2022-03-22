@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/firestore v1.6.1
 	github.com/google/uuid v1.3.0
 	github.com/pkg/errors v0.9.1
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1
 	google.golang.org/api v0.73.0
 	google.golang.org/grpc v1.45.0
 )
