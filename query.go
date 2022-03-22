@@ -83,7 +83,7 @@ func Query[T any](ctx context.Context, client *firestore.Client, c *Criteria) ([
 	return ToStructs[T](it)
 }
 
-// ToStructs converst the Firestore document iterator into a slice of structs.
+// ToStructs converts the Firestore document iterator into a slice of structs.
 func ToStructs[T any](it *firestore.DocumentIterator) ([]*T, error) {
 	if it == nil {
 		return nil, errors.Errorf("valid iterator required")
