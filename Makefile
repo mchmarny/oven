@@ -52,7 +52,7 @@ cover: test ## Runs unit tests and putputs coverage
 .PHONY: cover
 
 lint: ## Lints the entire project 
-	golangci-lint -c .golangci.yaml run --timeout=3m
+	golangci-lint -c .golangci.yaml run
 .PHONY: lint
 
 store: ## Run Firestore emulator image

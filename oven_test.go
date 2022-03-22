@@ -15,26 +15,25 @@ import (
 )
 
 func TestOven(t *testing.T) {
+	ctx := context.Background()
+	c := &firestore.Client{}
+
+	type S struct {
+		ID string `firestore:"id"`
+	}
+
 	t.Run("new with no args", func(t *testing.T) {
-		ctx := context.Background()
-		s := New(ctx, "test")
-		assert.NotNil(t, s)
-		assert.NoError(t, s.Close())
-		_, err := s.GetCollection(ctx, "")
+		_, err := GetCollection(c, "")
 		assert.Error(t, err)
-		err = s.Save(ctx, "", "", nil)
+		err = Save[S](ctx, c, "", "", nil)
 		assert.Error(t, err)
-		err = s.Update(ctx, "", "", nil)
+		err = Update(ctx, c, "", "", nil)
 		assert.Error(t, err)
-		err = s.Get(ctx, "", "", nil)
+		s, err := Get[S](ctx, c, "", "")
 		assert.Error(t, err)
-		err = s.Delete(ctx, "", "")
+		assert.Nil(t, s)
+		err = Delete(ctx, c, "", "")
 		assert.Error(t, err)
-	})
-	t.Run("new with firestore client", func(t *testing.T) {
-		c := &firestore.Client{}
-		s := NewWithClient(c)
-		assert.NotNil(t, s)
 	})
 	t.Run("data not found error", func(t *testing.T) {
 		assert.False(t, isDataNotFoundError(errors.New("data not found")))
@@ -53,20 +52,10 @@ func TestOvenIntegration(t *testing.T) {
 		t.Skip()
 	}
 
-	projectID := getEnv("PROJECT_ID", "")
-	assert.NotEmpty(t, projectID)
-
 	ctx := context.Background()
-
-	t.Run("new with valid args", func(t *testing.T) {
-		s := New(ctx, projectID)
-		assert.NotNil(t, s)
-	})
+	client := getTestClient(ctx, t)
 
 	t.Run("round trip", func(t *testing.T) {
-		s := New(ctx, projectID)
-		assert.NotNil(t, s)
-
 		col := fmt.Sprintf("testcol%d", time.Now().Nanosecond())
 		docID := id.NewID()
 
@@ -78,12 +67,11 @@ func TestOvenIntegration(t *testing.T) {
 		}
 
 		// save
-		err := s.Save(ctx, col, d.DocID, d)
+		err := Save(ctx, client, col, d.DocID, d)
 		assert.NoError(t, err)
 
 		// get
-		d2 := &TestDoc{}
-		err = s.Get(ctx, col, docID, d2)
+		d2, err := Get[TestDoc](ctx, client, col, docID)
 		assert.NoError(t, err)
 		assert.Equal(t, d.StringValue, d2.StringValue)
 		assert.Equal(t, d.Int64Value, d2.Int64Value)
@@ -93,23 +81,21 @@ func TestOvenIntegration(t *testing.T) {
 		// update
 		updatedValue := "updated"
 		m1 := map[string]interface{}{"s1": updatedValue}
-		err = s.Update(ctx, col, docID, m1)
+		err = Update(ctx, client, col, docID, m1)
 		assert.NoError(t, err)
 
-		d3 := &TestDoc{}
-		err = s.Get(ctx, col, docID, d3)
+		d3, err := Get[TestDoc](ctx, client, col, docID)
 		assert.NoError(t, err)
 		assert.Equal(t, updatedValue, d3.StringValue)
 		assert.Equal(t, d2.TimeValue.Format(time.RFC3339), d3.TimeValue.Format(time.RFC3339))
 		assert.Equal(t, d2.Int64Value, d3.Int64Value)
 
 		// delete
-		err = s.Delete(ctx, col, docID)
+		err = Delete(ctx, client, col, docID)
 		assert.NoError(t, err)
 
 		// no data found error after delete
-		d4 := &TestDoc{}
-		err = s.Get(ctx, col, docID, d4)
+		_, err = Get[TestDoc](ctx, client, col, docID)
 		assert.Error(t, err)
 		assert.Equal(t, ErrDataNotFound, err)
 	})
@@ -120,4 +106,13 @@ func getEnv(key, fallbackValue string) string {
 		return strings.TrimSpace(val)
 	}
 	return fallbackValue
+}
+
+func getTestClient(ctx context.Context, t *testing.T) *firestore.Client {
+	projectID := getEnv("PROJECT_ID", "")
+	assert.NotEmpty(t, projectID)
+	c, err := firestore.NewClient(ctx, projectID)
+	assert.NoError(t, err)
+	assert.NotNil(t, c)
+	return c
 }

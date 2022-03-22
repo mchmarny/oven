@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"cloud.google.com/go/firestore"
-	"github.com/mchmarny/oven/pkg/meta"
 	"github.com/pkg/errors"
 	"google.golang.org/api/iterator"
 )
@@ -37,10 +36,10 @@ var (
 	ErrInvalidDestinationType = errors.New("destination type must be a non nil pointer")
 )
 
-// Query represents a query to be executed against the Firestore.
-type Query struct {
+// Criteria represents a query to be executed against the Firestore.
+type Criteria struct {
 	Collection string
-	Criteria   *Criterion
+	Criterions []*Criterion
 	OrderBy    string
 	Desc       bool
 	Limit      int
@@ -56,59 +55,48 @@ type Criterion struct {
 // OperationType represents the type of operation to be performed.
 type OperationType string
 
-func appendWhere(col *firestore.CollectionRef, criteria ...*Criterion) {
-	if col == nil || len(criteria) == 0 {
-		return
-	}
-
-	for _, c := range criteria {
-		col.Where(c.Path, string(c.Operation), c.Value)
-	}
-}
-
 // Query retreaves access info for all users since last update.
-func (s *Service) Query(ctx context.Context, q *Query, d interface{}) error {
-	if q == nil || q.Collection == "" {
-		return errors.Errorf("valid query required: %+v", q)
+func Query[T any](ctx context.Context, client *firestore.Client, c *Criteria) ([]*T, error) {
+	if c == nil || c.Collection == "" {
+		return nil, errors.Errorf("valid query required: %+v", c)
 	}
 
 	// collection
-	col, err := s.GetCollection(ctx, q.Collection)
+	col, err := GetCollection(client, c.Collection)
 	if err != nil {
-		return errors.Wrapf(err, "error getting collection %s", q.Collection)
+		return nil, errors.Wrapf(err, "error getting collection %s", c.Collection)
 	}
 
 	// where
-	appendWhere(col, q.Criteria)
+	for _, r := range c.Criterions {
+		col.Where(r.Path, string(r.Operation), r.Value)
+	}
 
 	// desc?
 	dir := firestore.Desc
-	if !q.Desc {
+	if !c.Desc {
 		dir = firestore.Asc
 	}
 
-	m, err := meta.New(d)
-	if err != nil {
-		return err
-	}
+	list := make([]*T, 0)
 
 	// iterate
-	it := col.OrderBy(q.OrderBy, dir).Limit(q.Limit).Documents(ctx)
+	it := col.OrderBy(c.OrderBy, dir).Limit(c.Limit).Documents(ctx)
 	for {
 		d, e := it.Next()
 		if e == iterator.Done {
 			break
 		}
 		if e != nil {
-			return e
+			return nil, e
 		}
 
-		item := m.Item()
-		if e := d.DataTo(&item); e != nil {
-			return errors.Errorf("error converting data to struct: %v", e)
+		var t T
+		if e := d.DataTo(&t); e != nil {
+			return nil, errors.Errorf("error converting data to struct: %v", e)
 		}
-		m.Append(item)
+		list = append(list, &t)
 	}
 
-	return nil
+	return list, nil
 }

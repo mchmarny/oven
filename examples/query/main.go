@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	"github.com/mchmarny/oven"
 	"github.com/mchmarny/oven/examples/book"
 	"github.com/mchmarny/oven/pkg/id"
@@ -20,8 +21,11 @@ func main() {
 
 	ctx := context.Background()
 
-	// create a new oven service instance
-	service := oven.New(ctx, projectID)
+	// create firestore client
+	client, err := firestore.NewClient(ctx, projectID)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	bookCollectionSize := 10
 	bookAuthor := "Douglas Adams"
@@ -36,26 +40,28 @@ func main() {
 			Pages:     100 + i,
 			HardCover: false,
 		}
-		if err := service.Save(ctx, book.CollectionName, b.BookID, b); err != nil {
+		if err = oven.Save(ctx, client, book.CollectionName, b.BookID, b); err != nil {
 			log.Fatalf("failed to save: %v", err)
 		}
 	}
 
 	// get all books by the author
-	var list []book.Book
-	q := &oven.Query{
+	q := &oven.Criteria{
 		Collection: book.CollectionName,
-		Criteria: &oven.Criterion{
-			Path:      "author", // `firestore:"author"`
-			Operation: oven.OperationTypeEqual,
-			Value:     bookAuthor,
+		Criterions: []*oven.Criterion{
+			{
+				Path:      "author", // `firestore:"author"`
+				Operation: oven.OperationTypeEqual,
+				Value:     bookAuthor,
+			},
 		},
 		OrderBy: "published", // `firestore:"published"`
 		Desc:    true,
 		Limit:   bookCollectionSize,
 	}
 
-	if err := service.Query(ctx, q, &list); err != nil {
+	list, err := oven.Query[book.Book](ctx, client, q)
+	if err != nil {
 		log.Fatalf("failed to query: %v", err)
 	}
 

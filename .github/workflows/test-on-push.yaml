@@ -59,7 +59,6 @@ jobs:
       uses: golangci/golangci-lint-action@v2
       with:
         version: latest
-        args: --timeout 3m
 
     # fast, so run this first
     - name: Unit Test
