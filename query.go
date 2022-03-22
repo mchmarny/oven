@@ -78,10 +78,19 @@ func Query[T any](ctx context.Context, client *firestore.Client, c *Criteria) ([
 		dir = firestore.Asc
 	}
 
-	list := make([]*T, 0)
-
 	// iterate
 	it := col.OrderBy(c.OrderBy, dir).Limit(c.Limit).Documents(ctx)
+	return ToStructs[T](it)
+}
+
+// ToStructs converst the Firestore document iterator into a slice of structs.
+func ToStructs[T any](it *firestore.DocumentIterator) ([]*T, error) {
+	if it == nil {
+		return nil, errors.Errorf("valid iterator required")
+	}
+
+	list := make([]*T, 0)
+
 	for {
 		d, e := it.Next()
 		if e == iterator.Done {

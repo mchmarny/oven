@@ -102,6 +102,18 @@ if err != nil {
 }
 ```
 
+## Iterator 
+
+In case you already have the Firestore iterator and want to just avoid the verbose `for` loop of spooling the documents into a list, `oven` provides the `ToStructs` method
+
+```go
+// given it as *firestore.DocumentIterator
+it := col.Documents(ctx)
+
+// this returns a slice of books ([]*Book)
+list, err := oven.ToStructs[Book](it)
+```
+
 # License
 
 See [LICENSE](LICENSE)
