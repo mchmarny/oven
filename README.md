@@ -1,6 +1,6 @@
 # oven
 
-[Cloud Firestore](https://firebase.google.com/docs/firestore) wrapper client library
+[Cloud Firestore](https://firebase.google.com/docs/firestore) client helper library
 
 [![test](https://github.com/mchmarny/oven/actions/workflows/test-on-push.yaml/badge.svg?branch=main)](https://github.com/mchmarny/oven/actions/workflows/test-on-push.yaml) 
 [![Go Report Card](https://goreportcard.com/badge/github.com/mchmarny/oven)](https://goreportcard.com/report/github.com/mchmarny/oven) 
@@ -19,7 +19,7 @@ Having used Firestore on a few projects though, I did find it wee bit verbose an
 
 * Easy Save, Update, Get, Delete
 * Structured criteria Query
-* Easy to extend via Firestore client and collection accessors
+* Extends Firestore client
 
 # Install
 
@@ -34,30 +34,6 @@ The [examples](./examples) folder includes some of the most common use-cases wit
 * [Basic CRUD](examples/crud/main.go) - Save, Get, Update, Delete operations 
 * [Structured Query](examples/query/main.go) - With automatic result mapping to a slice
 
-## Service 
-
-```go
-package main
-
-import (
-	"context"
-
-	"github.com/mchmarny/oven"
-)
-
-func main() {
-	ctx := context.Background()
-	s := oven.New(ctx, "my-project-id")
-}
-```
-
-You can also use an existing Firestore client: 
-
-```go
-// c is an existing *firestore.Client
-s := oven.NewWithClient(c) 
-```
-
 ## Save
 
 ```go
@@ -67,7 +43,7 @@ b := Book{
 	Author: "Douglas Adams",
 }
 
-if err := s.Save(ctx, "books", b.ID, &b); err != nil {
+if err := oven.Save(ctx, client, "books", b.ID, &b); err != nil {
 	handleErr(err)
 }
 ```
@@ -75,8 +51,8 @@ if err := s.Save(ctx, "books", b.ID, &b); err != nil {
 ## Get
 
 ```go
-b := &Book{}
-if err := s.Get(ctx, "books", "id-123", b); err != nil {
+b, err := oven.Get[Book](ctx, client, "books", "id-123")
+if err != nil {
 	handleErr(err)
 }
 ```
@@ -90,7 +66,7 @@ m := map[string]interface{}{
 	"title": "Some new title",
 }
 
-if err := s.Update(ctx, "books", "id-123", m); err != nil {
+if err := oven.Update(ctx, client, "books", "id-123", m); err != nil {
 	handleErr(err)
 }
 ```
@@ -98,7 +74,7 @@ if err := s.Update(ctx, "books", "id-123", m); err != nil {
 ## Delete
 
 ```go
-if err := s.Delete(ctx, "books", "id-123"); err != nil {
+if err := oven.Delete(ctx, client, "books", "id-123"); err != nil {
 	handleErr(err)
 }
 ```
@@ -106,20 +82,22 @@ if err := s.Delete(ctx, "books", "id-123"); err != nil {
 ## Query
 
 ```go
-q := &oven.Query{
-	Collection: "books",
-	Criteria: &oven.Criterion{
-		Path:      "author", // `firestore:"author"`
-		Operation: oven.OperationTypeEqual,
-		Value:     "Douglas Adams",
+q := &oven.Criteria{
+	Collection: book.CollectionName,
+	Criterions: []*oven.Criterion{
+		{
+			Path:      "author", // `firestore:"author"`
+			Operation: oven.OperationTypeEqual,
+			Value:     bookAuthor,
+		},
 	},
 	OrderBy: "published", // `firestore:"published"`
 	Desc:    true,
-	Limit:   10,
+	Limit:   bookCollectionSize,
 }
 
-var list []*Book
-if err := s.Query(ctx, q, &list); err != nil {
+list, err := oven.Query(ctx, client, q)
+if err != nil {
 	handleErr(err)
 }
 ```
