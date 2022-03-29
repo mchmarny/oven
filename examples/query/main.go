@@ -37,7 +37,7 @@ func main() {
 			Name:      fmt.Sprintf("Galaxy, volume %d", i),
 			Author:    bookAuthor,
 			Published: time.Now().AddDate(-1, -2, -i).UTC(),
-			Pages:     100 + i,
+			Pages:     book.SampleBookNumOfPages,
 			HardCover: false,
 		}
 		if err = oven.Save(ctx, client, book.CollectionName, b.BookID, b); err != nil {

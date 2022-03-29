@@ -10,6 +10,11 @@ import (
 	"cloud.google.com/go/firestore"
 )
 
+const (
+	// MaxBatchSize is the maximum number of items that can be batched together.
+	MaxBatchSize = 500
+)
+
 var (
 	// ErrDataNotFound is thrown when query does not find the requested data.
 	ErrDataNotFound = errors.New("data not found")
@@ -141,5 +146,44 @@ func Update(ctx context.Context, client *firestore.Client, col, id string, args 
 	if err != nil {
 		return errors.Wrapf(err, "error updating %s record with id %s", col, id)
 	}
+	return nil
+}
+
+type Identifiable interface {
+	GetID() string
+}
+
+func BatchSet[T Identifiable](ctx context.Context, client *firestore.Client, col string, items ...T) error {
+	if client == nil {
+		return errors.New("nil client")
+	}
+
+	if col == "" {
+		return errors.New("nil collection name")
+	}
+
+	batchSize := len(items)
+	if batchSize == 0 {
+		return nil
+	}
+
+	if batchSize > MaxBatchSize {
+		return errors.Errorf("batch size %d exceeds max batch size %d", batchSize, MaxBatchSize)
+	}
+
+	c, err := GetCollection(client, col)
+	if err != nil {
+		return errors.Wrap(err, "error getting collection")
+	}
+
+	b := client.Batch()
+	for _, item := range items {
+		b.Set(c.Doc(item.GetID()), item)
+	}
+
+	if _, err := b.Commit(ctx); err != nil {
+		return errors.Wrapf(err, "error batch setting %d records on %s", batchSize, c.ID)
+	}
+
 	return nil
 }

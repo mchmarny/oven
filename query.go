@@ -85,6 +85,11 @@ func Query[T any](ctx context.Context, client *firestore.Client, c *Criteria) ([
 
 // ToStructs converts the Firestore document iterator into a slice of structs.
 func ToStructs[T any](it *firestore.DocumentIterator) ([]*T, error) {
+	return ToStructsWithHandler[T](it, nil)
+}
+
+// ToStructsWithHandler converts the Firestore document iterator into a slice of structs.
+func ToStructsWithHandler[T any](it *firestore.DocumentIterator, h func(item *T) (bool, error)) ([]*T, error) {
 	if it == nil {
 		return nil, errors.Errorf("valid iterator required")
 	}
@@ -101,10 +106,25 @@ func ToStructs[T any](it *firestore.DocumentIterator) ([]*T, error) {
 		}
 
 		var t T
-		if e := d.DataTo(&t); e != nil {
+		if e = d.DataTo(&t); e != nil {
 			return nil, errors.Errorf("error converting data to struct: %v", e)
 		}
-		list = append(list, &t)
+
+		// if no handler is provided, just add the struct to the list
+		if h == nil {
+			list = append(list, &t)
+			continue
+		}
+
+		// if the handler is provided, only add when it returns true
+		ok, e := h(&t)
+		if e != nil {
+			return nil, errors.Wrap(e, "error executing iterator handler")
+		}
+
+		if ok {
+			list = append(list, &t)
+		}
 	}
 
 	return list, nil

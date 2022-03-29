@@ -1,9 +1,9 @@
 linters-settings:
   dupl:
-    threshold: 150
+    threshold: 200
   funlen:
     lines: 150
-    statements: 70
+    statements: 100
   gci:
     local-prefixes: github.com/golangci/golangci-lint
   goconst:
@@ -26,6 +26,8 @@ linters-settings:
     min-complexity: 25
   goimports:
     local-prefixes: github.com/golangci/golangci-lint
+  golint:
+    min-confidence: 0
   govet:
     check-shadowing: true
   lll:
@@ -44,55 +46,37 @@ linters:
   disable-all: true
   enable:
     - deadcode
+    - depguard
     - dogsled
     - dupl
     - errcheck
-    - exhaustive
-    - exportloopref
     - funlen
-    - gofmt
     - gochecknoinits
     - goconst
-    - gocritic
     - gocyclo
-    - godot
     - gofmt
     - goimports
-    - revive
+    - gomnd
     - goprintffuncname
     - gosec
     - govet
-    - ineffassign
     - lll
     - misspell
     - nakedret
     - nolintlint
+    - exportloopref
     - structcheck
+    - typecheck
     - unconvert
     - varcheck
     - whitespace
-    - asciicheck
-    - depguard
-    - exportloopref
-    - funlen
-    - gochecknoglobals
-    - gocognit
-    - godox
-    - goheader
-    - gomodguard
-    - goprintffuncname
-    - nestif
-    - prealloc
-    - typecheck
-    - whitespace
 
-issues:
-  exclude-rules:
+# issues:
+#   exclude-rules:
       
-    - path: _test\.go
-      linters:
-        - bodyclose
-
+#     - path: _test\.go
+#       linters:
+#         - bodyclose
 
 run:
   concurrency: 4
@@ -101,7 +85,6 @@ run:
   tests: true
 
   skip-dirs:
-    - tests
     - tools
 
   # Enables skipping of directories:

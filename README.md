@@ -114,6 +114,21 @@ it := col.Documents(ctx)
 list, err := oven.ToStructs[Book](it)
 ```
 
+There is also support for a handler in case you need to reason over individual item. When handler returns an error, the entire `ToStructsWithHandler` method will exit with that error. 
+
+> Only items for which the handler returns `true` will be appended to the result slice. This allows for filtering the results when such filters are not possible in the Firestore itself. 
+
+```go
+it := col.Documents(ctx)
+
+return store.ToStructsWithHandler(it, func(item *Person) (bool, error) {
+	item.Age = time.Since(item.DOB)
+	return true, nil
+})
+```
+
+
+
 # License
 
 See [LICENSE](LICENSE)

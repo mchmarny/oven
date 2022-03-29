@@ -5,6 +5,9 @@ import "time"
 const (
 	// CollectionName is the book collection name.
 	CollectionName = "books"
+
+	// SampleBookNumOfPages is the number of pages in the sample book.
+	SampleBookNumOfPages = 100
 )
 
 // Book represents a simple book document.

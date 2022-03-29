@@ -33,7 +33,7 @@ func main() {
 		Name:      "The Hitchhiker's Guide to the Galaxy",
 		Author:    "Douglas Adams",
 		Published: time.Now().AddDate(-1, -2, -3).UTC(),
-		Pages:     100,
+		Pages:     book.SampleBookNumOfPages,
 		HardCover: true,
 	}
 
