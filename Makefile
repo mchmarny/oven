@@ -1,4 +1,4 @@
-RELEASE_VERSION    ?=v0.3.3
+RELEASE_VERSION    ?=v0.4.1
 EMULATOR_IMAGE     ?=ghcr.io/mchmarny/firestore-emulator:v0.3.2
 EMULATOR_HOST      ?=localhost
 EMULATOR_PORT      ?=8888
