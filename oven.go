@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
+	"google.golang.org/api/option"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -13,6 +14,8 @@ import (
 const (
 	// MaxBatchSize is the maximum number of items that can be batched together.
 	MaxBatchSize = 500
+
+	agentName = "oven"
 )
 
 var (
@@ -22,6 +25,20 @@ var (
 
 func isDataNotFoundError(err error) bool {
 	return err != nil && status.Code(err) == codes.NotFound
+}
+
+// GetClient returns instantiated Firestore client.
+func GetClient(ctx context.Context, projectID string) (client *firestore.Client, err error) {
+	return firestore.NewClient(ctx, projectID, option.WithUserAgent(agentName))
+}
+
+// GetClientOrPanic returns instantiated Firestore client or panics on error.
+func GetClientOrPanic(ctx context.Context, projectID string) *firestore.Client {
+	c, err := firestore.NewClient(ctx, projectID, option.WithUserAgent(agentName))
+	if err != nil {
+		panic(err)
+	}
+	return c
 }
 
 // GetCollection returns specific store collection by name.
